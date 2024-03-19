@@ -20,10 +20,18 @@ resource "aws_vpc_security_group_ingress_rule" "allow_http" {
   to_port           = 80
 }
 
+resource "aws_vpc_security_group_ingress_rule" "allow_ssh" {
+  security_group_id = aws_security_group.onpremsg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
+
 #Outbound rules
 
 resource "aws_vpc_security_group_egress_rule" "allow_http" {
-  security_group_id = aws_security_group.labsg.id
+  security_group_id = aws_security_group.onpremsg.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
@@ -55,7 +63,7 @@ resource "aws_instance" "onprem_server" {
   associate_public_ip_address  = true
   vpc_security_group_ids 	= ["${aws_security_group.onpremsg.id}"]
   #user_data         		= filebase64("./userdata.sh")
-  key_name      		= aws_key_pair.key_name
+  key_name      		= aws_key_pair.tenable.key_name
   
   metadata_options {
     http_tokens   = "optional"
